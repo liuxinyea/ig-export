@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Instagram Followers Exporter — LeadFlow",
+  "version": "0.1.0",
+  "description": "Export Instagram followers and following to CSV, Excel, HTML or Markdown. Local browser lead capture with API and browser modes.",
+  "action": {
+    "default_title": "Instagram Followers Exporter",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/leadflow-exporter-16.png",
+      "32": "icons/leadflow-exporter-32.png",
+      "64": "icons/leadflow-exporter-64.png",
+      "128": "icons/leadflow-exporter-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/leadflow-exporter-16.png",
+    "32": "icons/leadflow-exporter-32.png",
+    "64": "icons/leadflow-exporter-64.png",
+    "128": "icons/leadflow-exporter-128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["activeTab", "storage", "downloads", "tabs", "scripting"],
+  "host_permissions": ["https://www.instagram.com/*"],
+  "optional_host_permissions": [
+    "https://*.cdninstagram.com/*",
+    "https://*.fbcdn.net/*"
+  ],
+  "minimum_chrome_version": "102"
+}

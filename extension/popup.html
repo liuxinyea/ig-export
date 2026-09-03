@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="vendor/layui/css/layui.css">
+    <link rel="stylesheet" href="popup.css">
+    <link rel="stylesheet" href="layui-overrides.css">
+  </head>
+  <body>
+    <main class="layui-form" lay-filter="leadflow-popup">
+      <header class="popup-header"><div class="brand">LeadFlow</div><div class="status-row"><p id="pageStatus">Checking current page…</p><button id="clearData" class="layui-btn layui-btn-primary clear" hidden>Clear</button></div></header>
+      <section class="controls" aria-label="Collection settings"><label class="field">Collect<select id="listType"><option value="followers">Followers</option><option value="following">Following</option></select></label><label class="field">Limit<input id="limit" class="layui-input" type="number" min="1" value="300"></label><label class="field">Interval (ms)<input id="delay" class="layui-input" type="number" min="1000" step="500" value="5000"></label></section>
+      <section class="mode-group" aria-label="Collection mode"><label class="mode-option"><input type="radio" name="mode" value="api" title="Direct API" checked><span class="mode-description">Recommended · fastest local pagination</span></label><label class="mode-option"><input type="radio" name="mode" value="browser" title="Browser-assisted"><span class="mode-description">Use this if Direct API is restricted</span></label></section>
+      <button id="start" class="layui-btn layui-btn-fluid">Start collection</button><div id="taskActions" class="actions" hidden><button id="pause" class="layui-btn layui-btn-primary">Pause</button><button id="stop" class="layui-btn danger">Stop</button></div><div class="exports"><button id="csv" class="layui-btn layui-btn-primary">CSV</button><button id="json" class="layui-btn layui-btn-primary">JSON</button><button id="excel" class="layui-btn layui-btn-primary">Excel</button></div><button id="pricing" class="layui-btn layui-btn-primary layui-btn-fluid link">Pricing &amp; plans</button><p id="hint" class="hint">Use Direct API first. If Instagram restricts it, choose Browser-assisted and retry.</p>
+    </main>
+    <script src="vendor/layui/layui.js"></script><script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+.controls{display:flex;align-items:end;gap:12px;flex-wrap:nowrap}
+.controls>div:first-child{flex:1 1 320px;min-width:260px}
+.controls>div:not(:first-child){flex:0 1 130px;min-width:100px}
+.controls button{flex:0 0 auto}
+.exports{max-width:620px;justify-content:flex-end}
+@media(max-width:1050px){.controls{flex-wrap:wrap}.controls>div:first-child{flex-basis:100%}}
