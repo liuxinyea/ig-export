@@ -62,7 +62,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === "leadflow:collector-stop") {
-    stopCollector("Stopped by user", "stopped");
+    stopCollector("reason.stopped", "stopped");
     sendResponse({ ok: true });
     return;
   }
@@ -104,7 +104,7 @@ function pauseCollector() {
   if (collector.timer) clearTimeout(collector.timer);
   collector.timer = null;
   collector.paused = true;
-  chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: collector.taskId, status: "paused", reason: "Paused by user" } });
+  chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: collector.taskId, status: "paused", reasonKey: "reason.paused" } });
 }
 
 function resumeCollector() {
@@ -119,13 +119,13 @@ async function startBrowserCollection(payload) {
   const labels = await loadLabels();
   const trigger = findListTrigger(payload.listType, labels);
   if (!trigger) {
-    chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reason: `Could not find the ${payload.listType} control on this profile page.` } });
+    chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reasonKey: "reason.profileControlMissing", reasonParams: { listType: payload.listType } } });
     return;
   }
   trigger.click();
   const dialog = await waitForDialog();
   if (!dialog) {
-    chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reason: "Instagram did not open the list dialog. Refresh the profile and try again." } });
+    chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reasonKey: "reason.dialogMissing" } });
     return;
   }
   startCollector({ ...payload, labels });
@@ -182,16 +182,16 @@ function waitForDialog(timeoutMs = 8000) {
   });
 }
 
-function stopCollector(reason, status = "paused") {
+function stopCollector(reasonKey, status = "paused") {
   if (!collector) return;
   if (collector.timer) clearTimeout(collector.timer);
   const finished = collector;
   collector = null;
   globalThis.__leadflowCollector = null;
-  if (reason) {
+  if (reasonKey) {
     chrome.runtime.sendMessage({
       type: "leadflow:collector-status",
-      payload: { taskId: finished.taskId, status, reason }
+      payload: { taskId: finished.taskId, status, reasonKey }
     });
   }
 }
@@ -213,18 +213,18 @@ function collectOnce() {
   }
 
   if (collector.seen.size >= collector.limit) {
-    stopCollector("Reached the selected collection limit", "completed");
+    stopCollector("reason.limitReached", "completed");
     return;
   }
 
   const container = getScrollableList();
   if (!container) {
-    stopCollector("Instagram list dialog was closed. Collection interrupted; reopen it and start a new task.");
+    stopCollector("reason.dialogClosed");
     return;
   }
 
   if (collector.emptyCycles >= 4) {
-    stopCollector("No new visible profiles were loaded; the list may be complete or unavailable", "completed");
+    stopCollector("reason.noProfiles", "completed");
     return;
   }
 

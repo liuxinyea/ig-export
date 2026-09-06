@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>LeadFlow Workspace</title>
+        <title data-i18n="workspace.title">LeadFlow Workspace</title>
         <link rel="stylesheet" href="vendor/layui/css/layui.css" />
         <link rel="stylesheet" href="workspace.css" />
         <link rel="stylesheet" href="layui-overrides.css" />
@@ -12,56 +12,53 @@
         <main class="layui-form" lay-filter="leadflow-workspace">
             <header>
                 <div>
-                    <div class="eyebrow">LOCAL-FIRST RESEARCH</div>
+                    <div class="eyebrow" data-i18n="workspace.eyebrow">LOCAL-FIRST RESEARCH</div>
                     <h1>LeadFlow</h1>
-                    <p>Turn public Instagram lists into reviewable leads.</p>
+                    <p data-i18n="workspace.tagline">Turn public Instagram lists into reviewable leads.</p>
                 </div>
-                <div id="status" class="layui-badge status">No active task</div>
+                <div id="status" class="layui-badge status" data-i18n="status.none">No active task</div>
             </header>
             <section class="layui-panel panel controls">
                 <div>
                     <label
-                        >Source profile or URL<input
+                        ><span data-i18n="workspace.source">Source profile or URL</span><input
                             id="source"
-                            class="layui-input" placeholder="Open an Instagram profile, then paste its URL or username"
+                            class="layui-input" data-i18n-placeholder="workspace.sourcePlaceholder" placeholder="Open an Instagram profile, then paste its URL or username"
                     /></label>
                 </div>
                 <div>
                     <label
-                            >List type<select id="listType">
-                            <option value="followers">Followers</option>
-                            <option value="following">Following</option>
+                            ><span data-i18n="workspace.listType">List type</span><select id="listType">
+                            <option value="followers" data-i18n="list.followers">Followers</option>
+                            <option value="following" data-i18n="list.following">Following</option>
                         </select></label
                     >
                 </div>
                 <div>
                     <label
-                            >Limit<input id="limit" class="layui-input" type="number" min="1" value="300" /></label
+                            ><span data-i18n="popup.limit">Limit</span><input id="limit" class="layui-input" type="number" min="1" value="300" /></label
                     >
                 </div>
-                <div><label>Interval (ms)<input id="delay" class="layui-input" type="number" min="1000" step="500" value="5000" /></label></div>
-                <button id="start" class="layui-btn">Start collection</button
-                ><button id="pause" class="layui-btn layui-btn-primary secondary" hidden>Pause</button
-                ><button id="stop" class="layui-btn danger" hidden>Stop</button>
+                <div><label><span data-i18n="popup.interval">Interval (ms)</span><input id="delay" class="layui-input" type="number" min="1000" step="500" value="5000" /></label></div>
+                <button id="start" class="layui-btn" data-i18n="action.start">Start collection</button
+                ><button id="pause" class="layui-btn layui-btn-primary secondary" hidden data-i18n="action.pause">Pause</button
+                ><button id="stop" class="layui-btn danger" hidden data-i18n="action.stop">Stop</button>
             </section>
             <section class="layui-elem-quote notice">
-                LeadFlow requests public list data directly from this browser’s
-                existing Instagram session. Enter a public profile URL or
-                username. If Instagram slows or blocks access, collection pauses
-                rather than retrying aggressively.
+                <span data-i18n="workspace.notice">LeadFlow requests public list data directly from this browser’s existing Instagram session. Enter a public profile URL or username. If Instagram slows or blocks access, collection pauses rather than retrying aggressively.</span>
             </section>
             <section class="metrics">
-                <div class="layui-panel"><span>Collected</span><strong id="count">0</strong></div>
-                <div class="layui-panel"><span>Source</span><strong id="taskSource">—</strong></div>
+                <div class="layui-panel"><span data-i18n="workspace.collected">Collected</span><strong id="count">0</strong></div>
+                <div class="layui-panel"><span data-i18n="workspace.sourceMetric">Source</span><strong id="taskSource">—</strong></div>
                 <div class="layui-panel">
-                    <span>Last update</span><strong id="updated">—</strong>
+                    <span data-i18n="workspace.lastUpdate">Last update</span><strong id="updated">—</strong>
                 </div>
             </section>
             <section class="layui-panel panel">
                 <div class="table-head">
                     <div>
-                        <h2>Collected leads</h2>
-                        <p id="reason">No task has started.</p>
+                        <h2 data-i18n="workspace.collectedLeads">Collected leads</h2>
+                        <p id="reason" data-i18n="reason.noTask">No task has started.</p>
                     </div>
                     <div class="exports">
                         <button id="csv" class="layui-btn layui-btn-primary secondary">CSV</button
@@ -69,7 +66,7 @@
                         ><button id="html" class="layui-btn layui-btn-primary secondary">HTML</button
                         ><button id="markdown" class="layui-btn layui-btn-primary secondary">Markdown</button
                         ><button id="clear" class="layui-btn danger">
-                            Clear local task
+                            <span data-i18n="workspace.clearTask">Clear local task</span>
                         </button>
                     </div>
                 </div>
@@ -77,27 +74,23 @@
                     <table class="layui-table">
                         <thead>
                             <tr>
-                                <th>Avatar</th>
-                                <th>Username</th>
-                                <th>Name</th>
-                                <th>Profile</th>
-                                <th>Verified</th>
-                                <th>Collected</th>
+                                <th data-i18n="workspace.avatar">Avatar</th><th data-i18n="workspace.username">Username</th><th data-i18n="workspace.name">Name</th><th data-i18n="workspace.profile">Profile</th><th data-i18n="workspace.verified">Verified</th><th data-i18n="workspace.collectedAt">Collected</th>
                             </tr>
                         </thead>
                         <tbody id="rows">
                             <tr>
                                 <td colspan="6" class="empty">
-                                    No local records yet.
+                                    <span data-i18n="workspace.empty">No local records yet.</span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination"><button id="previous" class="layui-btn layui-btn-primary secondary">Previous</button><span id="pageInfo">Page 1</span><button id="next" class="layui-btn layui-btn-primary secondary">Next</button></div>
+                <div class="pagination"><button id="previous" class="layui-btn layui-btn-primary secondary" data-i18n="workspace.previous">Previous</button><span id="pageInfo">Page 1</span><button id="next" class="layui-btn layui-btn-primary secondary" data-i18n="workspace.next">Next</button></div>
             </section>
         </main>
         <script src="vendor/layui/layui.js"></script>
+        <script src="i18n.js"></script>
         <script src="instagram-api.js"></script>
         <script src="workspace-direct-v2.js"></script>
     </body>

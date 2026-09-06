@@ -17,13 +17,13 @@ window.LeadFlowInstagramApi = (() => {
 
   async function getProfile(username) {
     const normalized = normalizeUsername(username);
-    if (!normalized) throw new Error("Enter a valid Instagram username or profile URL.");
+    if (!normalized) throw localizedError("reason.invalidSource");
     // Direct mode mirrors the observed browser flow: first load the public
     // profile page, then use its numeric ID for GraphQL pagination.
     const response = await fetch(`https://www.instagram.com/${encodeURIComponent(normalized)}/`, { credentials: "include" });
     throwForHttp(response, "profile lookup");
     const id = extractProfileId(await response.text());
-    if (!id) throw new Error("Could not determine the numeric Instagram profile ID from this public profile page.");
+    if (!id) throw localizedError("reason.profileIdMissing");
     return { id, username: normalized };
   }
 
@@ -35,7 +35,7 @@ window.LeadFlowInstagramApi = (() => {
     throwForHttp(response, "list request");
     const body = await response.json();
     const connection = listType === "followers" ? body?.data?.user?.edge_followed_by : body?.data?.user?.edge_follow;
-    if (!connection?.edges) throw new Error("Instagram returned no accessible list data. The account may be private, restricted, or its web format changed.");
+    if (!connection?.edges) throw localizedError("reason.listUnavailable");
     return {
       records: connection.edges.map(({ node }) => ({
         username: node.username || "",
@@ -49,10 +49,12 @@ window.LeadFlowInstagramApi = (() => {
   }
 
   function throwForHttp(response, action) {
-    if (response.status === 401 || response.status === 403) throw new Error("Instagram rejected the current session. Sign in again, then retry.");
-    if (response.status === 429) throw new Error("Instagram rate-limited this browser session. Collection has paused.");
-    if (!response.ok) throw new Error(`Instagram ${action} failed (${response.status}).`);
+    if (response.status === 401 || response.status === 403) throw localizedError("reason.sessionRejected");
+    if (response.status === 429) throw localizedError("reason.rateLimited");
+    if (!response.ok) throw localizedError("reason.requestFailed", { action, status: response.status });
   }
+
+  function localizedError(reasonKey, reasonParams = {}) { const error = new Error(reasonKey); error.reasonKey = reasonKey; error.reasonParams = reasonParams; return error; }
 
   function extractProfileId(html) {
     const patterns = [

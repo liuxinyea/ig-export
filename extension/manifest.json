@@ -1,10 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Instagram Followers Exporter — LeadFlow",
+  "default_locale": "en",
+  "name": "__MSG_extensionName__",
   "version": "0.1.0",
-  "description": "Export Instagram followers and following to CSV, Excel, HTML or Markdown. Local browser lead capture with API and browser modes.",
+  "description": "__MSG_extensionDescription__",
   "action": {
-    "default_title": "Instagram Followers Exporter",
+    "default_title": "__MSG_actionTitle__",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/leadflow-exporter-16.png",

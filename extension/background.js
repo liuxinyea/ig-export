@@ -66,12 +66,14 @@ async function persistBatch({ taskId, records, sourceProfile }) {
   await chrome.storage.local.set({ [CURRENT_TASK_KEY]: task });
 }
 
-async function updateTaskStatus({ taskId, status, reason }) {
+async function updateTaskStatus({ taskId, status, reason, reasonKey, reasonParams }) {
   const stored = await chrome.storage.local.get(CURRENT_TASK_KEY);
   const task = stored[CURRENT_TASK_KEY];
   if (!task || task.id !== taskId) return;
   task.status = status;
   task.reason = reason || null;
+  task.reasonKey = reasonKey || null;
+  task.reasonParams = reasonParams || {};
   task.updatedAt = new Date().toISOString();
   await chrome.storage.local.set({ [CURRENT_TASK_KEY]: task });
 }
