@@ -1,0 +1,8 @@
+{
+  "name": "Türkçe (Turkish)",
+  "statLabels": {
+    "followers": { "suffix": ["takipçi"] },
+    "following": { "suffix": ["takip"] }
+  },
+  "verifiedMarkers": ["doğrulan"]
+}

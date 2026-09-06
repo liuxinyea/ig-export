@@ -1,0 +1,8 @@
+{
+  "name": "العربية (Arabic)",
+  "statLabels": {
+    "followers": { "stem": ["متابع"] },
+    "following": { "stem": ["يتابع"] }
+  },
+  "verifiedMarkers": ["موثق"]
+}

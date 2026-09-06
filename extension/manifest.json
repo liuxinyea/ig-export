@@ -29,5 +29,11 @@
     "https://*.cdninstagram.com/*",
     "https://*.fbcdn.net/*"
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["i18n/*.json"],
+      "matches": ["https://www.instagram.com/*"]
+    }
+  ],
   "minimum_chrome_version": "102"
 }

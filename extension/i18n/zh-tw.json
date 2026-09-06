@@ -1,0 +1,8 @@
+{
+  "name": "繁體中文 (Traditional Chinese)",
+  "statLabels": {
+    "followers": { "stem": ["粉絲"] },
+    "following": { "stem": ["追蹤"] }
+  },
+  "verifiedMarkers": ["認證"]
+}

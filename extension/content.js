@@ -1,76 +1,43 @@
-// Followers/following stat labels per Instagram UI language, all lowercase.
-// `suffix` matches via endsWith on the digit-bearing stat text; `stem`
-// matches via includes for languages whose label inflects with the count
-// (Russian genitive forms, Arabic tanwin, Polish case forms).
-const LIST_LABELS = {
-  followers: {
-    suffix: [
-      "followers",        // en
-      "粉丝", "粉絲",      // zh-cn / zh-tw
-      "フォロワー",        // ja
-      "팔로워",            // ko
-      "seguidores",       // es, pt
-      "abonnés",          // fr
-      "follower",         // de, it
-      "volgers",          // nl
-      "pengikut",         // id
-      "takipçi",          // tr
-      "ผู้ติดตาม",         // th
-      "người theo dõi",   // vi
-      "फ़ॉलोअर्स", "फ़ॉलोअर"  // hi
-    ],
-    stem: [
-      "подписчик",        // ru: подписчик / подписчика / подписчиков
-      "obserwując",       // pl: obserwujący / obserwujących
-      "متابع"             // ar: متابعون / متابعين / متابعًا
-    ]
-  },
-  following: {
-    suffix: [
-      "following",        // en
-      "关注", "追蹤中", "追蹤", // zh-cn / zh-tw
-      "フォロー中",        // ja
-      "팔로잉",            // ko
-      "seguidos", "siguiendo", // es
-      "seguindo",         // pt
-      "abonnements",      // fr
-      "gefolgt",          // de
-      "seguiti",          // it
-      "volgend",          // nl
-      "mengikuti",        // id
-      "takip",            // tr
-      "กำลังติดตาม",       // th
-      "đang theo dõi",    // vi
-      "फ़ॉलोइंग"           // hi
-    ],
-    stem: [
-      "подписк",          // ru: подписка / подписки / подписок
-      "obserwowan",       // pl: obserwowane / obserwowanych
-      "يتابع"             // ar
-    ]
-  }
-};
+// Localized Instagram UI labels live in i18n/<locale>.json, registered in
+// i18n/index.json. They are loaded on demand and merged across all locales:
+// stat labels become { followers: { suffix, stem }, following: { suffix, stem } }
+// (suffix = count precedes label, matched via endsWith; stem = label may wrap
+// or precede the count, matched via includes) plus a flat verifiedMarkers list.
+// All values are pre-normalized (whitespace stripped, lowercased) to match the
+// whitespace-stripped page text. Add a language by dropping in a JSON file and
+// registering it in i18n/index.json — no code changes needed.
+let labelsPromise = null;
 
-// Localized labels of Instagram's verified badge (aria-label / <title>).
-const VERIFIED_MARKERS = [
-  "verified",           // en
-  "认证", "認證",        // zh-cn / zh-tw
-  "認証済み",            // ja
-  "인증",               // ko
-  "verificado",         // es, pt
-  "vérifié",            // fr
-  "verifiziert",        // de
-  "verificato",         // it
-  "подтвержд", "верифиц", // ru
-  "موثق",               // ar
-  "doğrulan",           // tr
-  "terverifikasi",      // id
-  "geverifieerd",       // nl
-  "zweryfikow",         // pl
-  "सत्यापित",            // hi
-  "xác minh",           // vi
-  "ยืนยัน"               // th
-];
+function loadLabels() {
+  if (!labelsPromise) labelsPromise = (async () => {
+    const merged = {
+      followers: { suffix: [], stem: [] },
+      following: { suffix: [], stem: [] },
+      verifiedMarkers: []
+    };
+    const manifest = await fetch(chrome.runtime.getURL("i18n/index.json")).then((response) => response.json());
+    await Promise.all(manifest.locales.map(async (locale) => {
+      try {
+        const data = await fetch(chrome.runtime.getURL(`i18n/${locale}.json`)).then((response) => response.json());
+        for (const listType of ["followers", "following"]) {
+          for (const kind of ["suffix", "stem"]) {
+            const values = data.statLabels?.[listType]?.[kind] || [];
+            merged[listType][kind].push(...values.map(normalizeLabel));
+          }
+        }
+        merged.verifiedMarkers.push(...(data.verifiedMarkers || []).map(normalizeLabel));
+      } catch {
+        // A missing or malformed locale file must not break collection.
+      }
+    }));
+    return merged;
+  })();
+  return labelsPromise;
+}
+
+function normalizeLabel(value) {
+  return String(value || "").replace(/\s+/g, "").toLowerCase();
+}
 
 // `var` deliberately permits a fresh injection after the extension itself has
 // been reloaded while the Instagram tab stayed open.
@@ -126,6 +93,9 @@ function startCollector(payload) {
     timer: null
   };
   globalThis.__leadflowCollector = collector;
+  if (!collector.labels) {
+    loadLabels().then((labels) => { if (collector) collector.labels = labels; });
+  }
   collectOnce();
 }
 
@@ -146,7 +116,8 @@ function resumeCollector() {
 
 async function startBrowserCollection(payload) {
   stopCollector();
-  const trigger = findListTrigger(payload.listType);
+  const labels = await loadLabels();
+  const trigger = findListTrigger(payload.listType, labels);
   if (!trigger) {
     chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reason: `Could not find the ${payload.listType} control on this profile page.` } });
     return;
@@ -157,10 +128,10 @@ async function startBrowserCollection(payload) {
     chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reason: "Instagram did not open the list dialog. Refresh the profile and try again." } });
     return;
   }
-  startCollector(payload);
+  startCollector({ ...payload, labels });
 }
 
-function findListTrigger(listType) {
+function findListTrigger(listType, labels) {
   const pathPart = listType === "followers" ? "/followers" : "/following";
   const link = [...document.querySelectorAll("a[href]")].find((element) => element.getAttribute("href")?.includes(pathPart));
   if (link) return link;
@@ -168,29 +139,27 @@ function findListTrigger(listType) {
   // New Instagram profile pages use <a href="#" role="link"> for their
   // profile stats. Search the full document because the profile shell does not
   // consistently use a <main> or <header> ancestor across experiments.
-  const { suffix: suffixLabels, stem: stemLabels } = LIST_LABELS[listType];
-  const directStat = [...document.querySelectorAll('a[role="link"], [role="link"]')]
-    .find((element) => {
-      const text = normalizeStatText(element.textContent);
-      if (text.length > 40 || !hasDigit(text)) return false;
-      const lower = text.toLowerCase();
-      return suffixLabels.some((label) => lower.endsWith(label.toLowerCase())) ||
-        stemLabels.some((label) => lower.includes(label.toLowerCase()));
-    });
+  const { suffix: suffixLabels, stem: stemLabels } = labels[listType];
+  const matchStat = (element) => {
+    const text = normalizeStatText(element.textContent);
+    if (text.length > 40 || !hasDigit(text)) return false;
+    return matchesStatLabel(text, suffixLabels, stemLabels);
+  };
+  const directStat = [...document.querySelectorAll('a[role="link"], [role="link"]')].find(matchStat);
   if (directStat) return directStat;
 
   // Fallback for older layouts where the statistic is nested under another
   // interactive element. The digit requirement excludes the follow button.
   const profileRoot = document.querySelector("main") || document;
-  const stat = [...profileRoot.querySelectorAll('a[role="link"], a, button, [role=button], span, div')]
-    .find((element) => {
-      const text = normalizeStatText(element.textContent);
-      if (text.length > 40 || !hasDigit(text)) return false;
-      const lower = text.toLowerCase();
-      return suffixLabels.some((label) => lower.endsWith(label.toLowerCase())) ||
-        stemLabels.some((label) => lower.includes(label.toLowerCase()));
-    });
+  const stat = [...profileRoot.querySelectorAll('a[role="link"], a, button, [role=button], span, div')].find(matchStat);
   return stat?.closest("a, button, [role=button]") || null;
+}
+
+function matchesStatLabel(text, suffixLabels, stemLabels) {
+  // Labels are pre-normalized (whitespace stripped, lowercased) at load time,
+  // matching the whitespace-stripped page text.
+  return suffixLabels.some((label) => text.endsWith(label)) ||
+    stemLabels.some((label) => text.includes(label));
 }
 
 function normalizeStatText(value) {
@@ -291,8 +260,8 @@ function collectVisibleProfiles() {
       avatarUrl: row?.querySelector("img")?.currentSrc || "",
       isVerified: Boolean(row?.querySelector('svg[aria-label], svg[title]')) &&
         [...row.querySelectorAll('svg[aria-label], svg[title]')].some((svg) => {
-          const label = (svg.getAttribute("aria-label") || svg.querySelector("title")?.textContent || "").toLowerCase();
-          return label && VERIFIED_MARKERS.some((marker) => label.includes(marker.toLowerCase()));
+          const label = normalizeLabel(svg.getAttribute("aria-label") || svg.querySelector("title")?.textContent || "");
+          return label && (collector?.labels?.verifiedMarkers || []).some((marker) => label.includes(marker));
         })
     });
   }

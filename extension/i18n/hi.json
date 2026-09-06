@@ -1,0 +1,8 @@
+{
+  "name": "हिन्दी (Hindi)",
+  "statLabels": {
+    "followers": { "suffix": ["फ़ॉलोअर्स", "फ़ॉलोअर"] },
+    "following": { "suffix": ["फ़ॉलोइंग"] }
+  },
+  "verifiedMarkers": ["सत्यापित"]
+}

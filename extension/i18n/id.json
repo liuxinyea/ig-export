@@ -1,0 +1,8 @@
+{
+  "name": "Bahasa Indonesia (Indonesian)",
+  "statLabels": {
+    "followers": { "suffix": ["pengikut"] },
+    "following": { "suffix": ["mengikuti"] }
+  },
+  "verifiedMarkers": ["terverifikasi"]
+}

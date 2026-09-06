@@ -1,0 +1,8 @@
+{
+  "name": "Polski (Polish)",
+  "statLabels": {
+    "followers": { "stem": ["obserwując"] },
+    "following": { "stem": ["obserwowan"] }
+  },
+  "verifiedMarkers": ["zweryfikow"]
+}

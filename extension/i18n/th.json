@@ -1,0 +1,8 @@
+{
+  "name": "ไทย (Thai)",
+  "statLabels": {
+    "followers": { "stem": ["ผู้ติดตาม"] },
+    "following": { "stem": ["กำลังติดตาม", "ติดตาม"] }
+  },
+  "verifiedMarkers": ["ยืนยัน"]
+}

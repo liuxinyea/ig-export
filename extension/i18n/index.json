@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "description": "Per-locale Instagram UI label overrides used by the content script. Files not listed here are ignored. Add a new locale: create <locale>.json (same shape as the others) and register it below. Matching is cumulative across all locales, so only missing variants need adding.",
+  "locales": [
+    "en",
+    "zh-cn",
+    "zh-tw",
+    "ja",
+    "ko",
+    "es",
+    "pt",
+    "fr",
+    "de",
+    "it",
+    "nl",
+    "id",
+    "tr",
+    "th",
+    "vi",
+    "hi",
+    "ru",
+    "pl",
+    "ar"
+  ]
+}

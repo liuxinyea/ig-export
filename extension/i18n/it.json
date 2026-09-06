@@ -1,0 +1,8 @@
+{
+  "name": "Italiano (Italian)",
+  "statLabels": {
+    "followers": { "suffix": ["follower"] },
+    "following": { "suffix": ["seguiti"] }
+  },
+  "verifiedMarkers": ["verificato"]
+}

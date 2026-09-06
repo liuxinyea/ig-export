@@ -1,0 +1,8 @@
+{
+  "name": "한국어 (Korean)",
+  "statLabels": {
+    "followers": { "stem": ["팔로워"] },
+    "following": { "stem": ["팔로잉"] }
+  },
+  "verifiedMarkers": ["인증"]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "日本語 (Japanese)",
+  "statLabels": {
+    "followers": { "stem": ["フォロワー"] },
+    "following": { "stem": ["フォロー中", "フォロー"] }
+  },
+  "verifiedMarkers": ["認証済み"]
+}

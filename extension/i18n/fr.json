@@ -1,0 +1,8 @@
+{
+  "name": "Français (French)",
+  "statLabels": {
+    "followers": { "suffix": ["abonnés"] },
+    "following": { "suffix": ["abonnements"] }
+  },
+  "verifiedMarkers": ["vérifié"]
+}

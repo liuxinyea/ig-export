@@ -1,0 +1,8 @@
+{
+  "name": "Nederlands (Dutch)",
+  "statLabels": {
+    "followers": { "suffix": ["volgers"] },
+    "following": { "suffix": ["volgend"] }
+  },
+  "verifiedMarkers": ["geverifieerd"]
+}

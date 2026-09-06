@@ -1,0 +1,8 @@
+{
+  "name": "Tiếng Việt (Vietnamese)",
+  "statLabels": {
+    "followers": { "suffix": ["người theo dõi"] },
+    "following": { "suffix": ["đang theo dõi"] }
+  },
+  "verifiedMarkers": ["xác minh"]
+}

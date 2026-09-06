@@ -1,0 +1,8 @@
+{
+  "name": "Deutsch (German)",
+  "statLabels": {
+    "followers": { "suffix": ["follower"] },
+    "following": { "suffix": ["gefolgt"] }
+  },
+  "verifiedMarkers": ["verifiziert"]
+}

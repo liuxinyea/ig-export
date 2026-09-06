@@ -1,0 +1,8 @@
+{
+  "name": "简体中文 (Simplified Chinese)",
+  "statLabels": {
+    "followers": { "stem": ["粉丝"] },
+    "following": { "stem": ["关注"] }
+  },
+  "verifiedMarkers": ["认证"]
+}
