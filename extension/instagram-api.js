@@ -1,4 +1,4 @@
-window.LeadFlowInstagramApi = (() => {
+window.FreeIgExportInstagramApi = (() => {
   const queryHashes = {
     followers: "37479f2b8209594dde7facb0d904896a",
     following: "58712303d941c6855d4e888c5f0cd22f"

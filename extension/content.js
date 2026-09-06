@@ -41,45 +41,45 @@ function normalizeLabel(value) {
 
 // `var` deliberately permits a fresh injection after the extension itself has
 // been reloaded while the Instagram tab stayed open.
-var collector = globalThis.__leadflowCollector || null;
+var collector = globalThis.__freeIgExportCollector || null;
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === "leadflow:ping") {
+  if (message.type === "free-ig-export:ping") {
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:collector-start") {
+  if (message.type === "free-ig-export:collector-start") {
     startCollector(message.payload);
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:browser-collection-start") {
+  if (message.type === "free-ig-export:browser-collection-start") {
     startBrowserCollection(message.payload);
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:collector-stop") {
+  if (message.type === "free-ig-export:collector-stop") {
     stopCollector("reason.stopped", "stopped");
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:collector-pause") {
+  if (message.type === "free-ig-export:collector-pause") {
     pauseCollector();
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:collector-resume") {
+  if (message.type === "free-ig-export:collector-resume") {
     resumeCollector();
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:scan-profile") {
+  if (message.type === "free-ig-export:scan-profile") {
     sendResponse({ profile: scanProfile() });
   }
 });
@@ -92,7 +92,7 @@ function startCollector(payload) {
     seen: new Set(),
     timer: null
   };
-  globalThis.__leadflowCollector = collector;
+  globalThis.__freeIgExportCollector = collector;
   if (!collector.labels) {
     loadLabels().then((labels) => { if (collector) collector.labels = labels; });
   }
@@ -104,13 +104,13 @@ function pauseCollector() {
   if (collector.timer) clearTimeout(collector.timer);
   collector.timer = null;
   collector.paused = true;
-  chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: collector.taskId, status: "paused", reasonKey: "reason.paused" } });
+  chrome.runtime.sendMessage({ type: "free-ig-export:collector-status", payload: { taskId: collector.taskId, status: "paused", reasonKey: "reason.paused" } });
 }
 
 function resumeCollector() {
   if (!collector || !collector.paused) return;
   collector.paused = false;
-  chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: collector.taskId, status: "running", reason: null } });
+  chrome.runtime.sendMessage({ type: "free-ig-export:collector-status", payload: { taskId: collector.taskId, status: "running", reason: null } });
   collectOnce();
 }
 
@@ -119,13 +119,13 @@ async function startBrowserCollection(payload) {
   const labels = await loadLabels();
   const trigger = findListTrigger(payload.listType, labels);
   if (!trigger) {
-    chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reasonKey: "reason.profileControlMissing", reasonParams: { listType: payload.listType } } });
+    chrome.runtime.sendMessage({ type: "free-ig-export:collector-status", payload: { taskId: payload.taskId, status: "paused", reasonKey: "reason.profileControlMissing", reasonParams: { listType: payload.listType } } });
     return;
   }
   trigger.click();
   const dialog = await waitForDialog();
   if (!dialog) {
-    chrome.runtime.sendMessage({ type: "leadflow:collector-status", payload: { taskId: payload.taskId, status: "paused", reasonKey: "reason.dialogMissing" } });
+    chrome.runtime.sendMessage({ type: "free-ig-export:collector-status", payload: { taskId: payload.taskId, status: "paused", reasonKey: "reason.dialogMissing" } });
     return;
   }
   startCollector({ ...payload, labels });
@@ -187,10 +187,10 @@ function stopCollector(reasonKey, status = "paused") {
   if (collector.timer) clearTimeout(collector.timer);
   const finished = collector;
   collector = null;
-  globalThis.__leadflowCollector = null;
+  globalThis.__freeIgExportCollector = null;
   if (reasonKey) {
     chrome.runtime.sendMessage({
-      type: "leadflow:collector-status",
+      type: "free-ig-export:collector-status",
       payload: { taskId: finished.taskId, status, reasonKey }
     });
   }
@@ -205,7 +205,7 @@ function collectOnce() {
   if (fresh.length) {
     collector.emptyCycles = 0;
     chrome.runtime.sendMessage({
-      type: "leadflow:collector-batch",
+      type: "free-ig-export:collector-batch",
       payload: { taskId: collector.taskId, records: fresh, sourceProfile: collector.sourceProfile }
     });
   } else {

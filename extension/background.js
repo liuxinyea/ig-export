@@ -1,23 +1,23 @@
-const CURRENT_TASK_KEY = "leadflow.currentTask";
+const CURRENT_TASK_KEY = "free-ig-export.currentTask";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "leadflow:open-workspace") {
+  if (message.type === "free-ig-export:open-workspace") {
     chrome.tabs.create({ url: "workspace.html" });
     sendResponse({ ok: true });
     return;
   }
 
-  if (message.type === "leadflow:collector-batch") {
+  if (message.type === "free-ig-export:collector-batch") {
     persistBatch(message.payload).then(() => sendResponse({ ok: true }));
     return true;
   }
 
-  if (message.type === "leadflow:collector-status") {
+  if (message.type === "free-ig-export:collector-status") {
     updateTaskStatus(message.payload).then(() => sendResponse({ ok: true }));
     return true;
   }
 
-  if (message.type === "leadflow:avatar-fetch") {
+  if (message.type === "free-ig-export:avatar-fetch") {
     fetchAvatarDataUrl(message.url).then(sendResponse);
     return true;
   }

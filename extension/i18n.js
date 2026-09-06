@@ -1,5 +1,5 @@
 (() => {
-  const SETTINGS_KEY = "leadflow.locale";
+  const SETTINGS_KEY = "free-ig-export.locale";
   const FALLBACK = "en";
   const supported = ["en", "zh-cn", "zh-tw"];
   let messages = {};
@@ -37,5 +37,5 @@
     await chrome.storage.local.set({ [SETTINGS_KEY]: value });
     return init();
   }
-  globalThis.LeadFlowI18n = { init, t, apply, setPreference, get locale() { return locale; }, SETTINGS_KEY };
+  globalThis.FreeIgExportI18n = { init, t, apply, setPreference, get locale() { return locale; }, SETTINGS_KEY };
 })();

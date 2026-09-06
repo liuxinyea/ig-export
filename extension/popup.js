@@ -1,7 +1,7 @@
-const TASK_KEY = "leadflow.currentTask";
+const TASK_KEY = "free-ig-export.currentTask";
 let currentTab = null;
 const $ = (selector) => document.querySelector(selector);
-const t = (key, params) => LeadFlowI18n.t(key, params);
+const t = (key, params) => FreeIgExportI18n.t(key, params);
 
 async function initialize() {
   const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
@@ -36,7 +36,7 @@ $("#start").addEventListener("click", async () => {
     await ensureContentScript(currentTab.id);
     const task = { id: crypto.randomUUID(), status: "starting", reason: null, sourceProfile: username, listType, limit, records: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     await chrome.storage.local.set({ [TASK_KEY]: task });
-    await chrome.tabs.sendMessage(currentTab.id, { type: "leadflow:browser-collection-start", payload: { taskId: task.id, sourceProfile: username, listType, limit, delayMs } });
+    await chrome.tabs.sendMessage(currentTab.id, { type: "free-ig-export:browser-collection-start", payload: { taskId: task.id, sourceProfile: username, listType, limit, delayMs } });
     renderTask(task, username);
   } catch (error) { $("#hint").textContent = error.message || t("reason.apiPaused"); }
 });
@@ -49,17 +49,17 @@ $("#json").addEventListener("click", () => exportTask("json"));
 $("#excel").addEventListener("click", () => exportTask("xls"));
 $("#clearData").addEventListener("click", clearLocalData);
 $("#language").addEventListener("change", async (event) => {
-  await LeadFlowI18n.setPreference(event.target.value);
+  await FreeIgExportI18n.setPreference(event.target.value);
   if (window.layui) layui.form.render("select");
   renderTask((await chrome.storage.local.get(TASK_KEY))[TASK_KEY], usernameFromUrl(currentTab?.url));
 });
 document.querySelectorAll('input[name="mode"]').forEach((input) => input.addEventListener("change", updateStartAvailability));
 
 async function ensureContentScript(tabId) {
-  try { await chrome.tabs.sendMessage(tabId, { type: "leadflow:ping" }); }
+  try { await chrome.tabs.sendMessage(tabId, { type: "free-ig-export:ping" }); }
   catch {
     await chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] });
-    await chrome.tabs.sendMessage(tabId, { type: "leadflow:ping" });
+    await chrome.tabs.sendMessage(tabId, { type: "free-ig-export:ping" });
   }
 }
 
@@ -84,8 +84,8 @@ function updateStartAvailability() {
   $("#hint").textContent = isApiMode
     ? t("popup.apiHint") : t("popup.browserHint");
 }
-LeadFlowI18n.init().then(async () => {
-  $("#language").value = (await chrome.storage.local.get(LeadFlowI18n.SETTINGS_KEY))[LeadFlowI18n.SETTINGS_KEY] || "auto";
+FreeIgExportI18n.init().then(async () => {
+  $("#language").value = (await chrome.storage.local.get(FreeIgExportI18n.SETTINGS_KEY))[FreeIgExportI18n.SETTINGS_KEY] || "auto";
   if (window.layui) layui.use("form", () => { initialize(); layui.form.render(); }); else initialize();
 });
 
@@ -118,9 +118,9 @@ async function controlCollection(action) {
   try {
     await ensureContentScript(currentTab.id);
     if (action === "pause" && task.status === "paused") {
-      await chrome.tabs.sendMessage(currentTab.id, { type: "leadflow:collector-resume" });
+      await chrome.tabs.sendMessage(currentTab.id, { type: "free-ig-export:collector-resume" });
     } else {
-      await chrome.tabs.sendMessage(currentTab.id, { type: action === "stop" ? "leadflow:collector-stop" : "leadflow:collector-pause" });
+      await chrome.tabs.sendMessage(currentTab.id, { type: action === "stop" ? "free-ig-export:collector-stop" : "free-ig-export:collector-pause" });
     }
   } catch (error) { setHint(error.message || t("popup.noTask")); }
 }
@@ -143,7 +143,7 @@ async function exportTask(format) {
     mimeType = "text/csv;charset=utf-8"; extension = "csv";
   }
   const url = URL.createObjectURL(new Blob([content], { type: mimeType }));
-  await chrome.downloads.download({ url, filename: `leadflow-${task.sourceProfile}-${new Date().toISOString().slice(0, 10)}.${extension}`, saveAs: true });
+  await chrome.downloads.download({ url, filename: `free-ig-export-${task.sourceProfile}-${new Date().toISOString().slice(0, 10)}.${extension}`, saveAs: true });
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
@@ -159,7 +159,7 @@ async function clearLocalData() {
   try {
     if (currentTab?.id && ["starting", "running", "paused"].includes(task.status)) {
       await ensureContentScript(currentTab.id);
-      await chrome.tabs.sendMessage(currentTab.id, { type: "leadflow:collector-stop" });
+      await chrome.tabs.sendMessage(currentTab.id, { type: "free-ig-export:collector-stop" });
     }
   } catch { /* Clear data even if the original tab was closed. */ }
   await chrome.storage.local.remove(TASK_KEY);

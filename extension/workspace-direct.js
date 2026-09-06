@@ -1,4 +1,4 @@
-const TASK_KEY = "leadflow.currentTask";
+const TASK_KEY = "free-ig-export.currentTask";
 const $ = (selector) => document.querySelector(selector);
 let activeRun = null;
 const launchParams = new URLSearchParams(location.search);
@@ -37,7 +37,7 @@ $("#useCurrent").addEventListener("click", async () => {
 
 $("#start").addEventListener("click", async () => {
   try {
-    const username = LeadFlowInstagramApi.normalizeUsername($("#source").value);
+    const username = FreeIgExportInstagramApi.normalizeUsername($("#source").value);
     if (!username) throw new Error("Enter a public Instagram username or profile URL.");
     if (activeRun) activeRun.stopped = true;
     const task = { id: crypto.randomUUID(), status: "starting", reason: null, sourceProfile: username, listType: $("#listType").value, limit: Number($("#limit").value), records: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
@@ -74,12 +74,12 @@ async function runCollection(task) {
   const run = { taskId: task.id, stopped: false };
   activeRun = run;
   try {
-    const profile = await LeadFlowInstagramApi.getProfile(task.sourceProfile);
+    const profile = await FreeIgExportInstagramApi.getProfile(task.sourceProfile);
     let cursor = null;
     let records = [];
     await saveTask({ ...task, status: "running", sourceProfile: profile.username, updatedAt: new Date().toISOString() });
     while (!run.stopped && records.length < task.limit) {
-      const page = await LeadFlowInstagramApi.getPage({ profileId: profile.id, listType: task.listType, cursor });
+      const page = await FreeIgExportInstagramApi.getPage({ profileId: profile.id, listType: task.listType, cursor });
       const seen = new Set(records.map((record) => record.username));
       records.push(...page.records.filter((record) => !seen.has(record.username)).slice(0, task.limit - records.length).map((record) => ({ ...record, platform: "instagram", sourceProfile: profile.username, collectedAt: new Date().toISOString() })));
       await saveTask({ ...task, status: "running", sourceProfile: profile.username, records, updatedAt: new Date().toISOString() });
@@ -104,7 +104,7 @@ async function exportFile(format) {
   if (format === "json") { content = JSON.stringify(records, null, 2); type = "application/json"; suffix = "json"; }
   else { const columns = ["platform", "sourceProfile", "username", "displayName", "profileUrl", "avatarUrl", "isVerified", "collectedAt"]; content = [columns.join(","), ...records.map((record) => columns.map((key) => csvCell(record[key])).join(","))].join("\n"); type = "text/csv;charset=utf-8"; suffix = "csv"; }
   const url = URL.createObjectURL(new Blob([content], { type }));
-  await chrome.downloads.download({ url, filename: `leadflow-instagram-${new Date().toISOString().slice(0, 10)}.${suffix}`, saveAs: true });
+  await chrome.downloads.download({ url, filename: `free-ig-export-instagram-${new Date().toISOString().slice(0, 10)}.${suffix}`, saveAs: true });
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 

@@ -1,4 +1,4 @@
-# LeadFlow Chrome Extension MVP
+# free-ig-export Chrome Extension MVP
 
 Load this folder in Chrome through `chrome://extensions` → enable Developer mode → **Load unpacked** → choose this `extension` directory.
 
@@ -12,7 +12,7 @@ Load this folder in Chrome through `chrome://extensions` → enable Developer mo
 ## Test flow
 
 1. Sign in to Instagram in Chrome yourself and open a public profile.
-2. Open LeadFlow from the toolbar; Browser-assisted mode is selected by default.
+2. Open free-ig-export from the toolbar; Browser-assisted mode is selected by default.
 3. Choose Followers/Following and a limit, then start collection. Keep the Instagram tab and its list dialog open until the task ends.
 4. Select Direct API mode only when you want the separate workspace flow; it pre-fills the current profile and list configuration.
 5. Pause or export the local results from the workspace.

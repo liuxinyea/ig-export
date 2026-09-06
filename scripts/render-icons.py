@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate LeadFlow extension PNG icons from the approved 128px source."""
+"""Regenerate free-ig-export extension PNG icons from the approved 128px source."""
 
 from pathlib import Path
 import sys
@@ -9,7 +9,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ICONS_DIR = ROOT / "extension" / "icons"
-SOURCE = ICONS_DIR / "leadflow-exporter-128.png"
+SOURCE = ICONS_DIR / "free-ig-export-128.png"
 SIZES = (16, 32, 64, 128)
 
 
@@ -28,7 +28,7 @@ def main() -> int:
             return 1
 
         for size in SIZES:
-            output = ICONS_DIR / f"leadflow-exporter-{size}.png"
+            output = ICONS_DIR / f"free-ig-export-{size}.png"
             image = source if size == 128 else source.resize((size, size), Image.Resampling.LANCZOS)
             image.save(output, format="PNG", optimize=True)
             print(f"[icons] Wrote {output.relative_to(ROOT)} ({size}x{size})")
