@@ -1,9 +1,15 @@
-# Packaged Chrome Web Store artifacts
+# Chrome Web Store packaged artifacts
 /free-ig-export-v*.zip
-/*.crx
+*.crx
 
-# Dependencies and local environment files
-/node_modules/
+# Node / Next.js (website/)
+/website/node_modules/
+/website/.next/
+/website/out/
+/website/.vercel/
+*.tsbuildinfo
+
+# Env files (except examples)
 .env
 .env.*
 !.env.example
@@ -14,7 +20,7 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Test, coverage, and cache output
+# Logs and caches
+*.log
 /coverage/
 /.cache/
-*.log

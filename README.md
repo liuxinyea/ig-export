@@ -1,6 +1,26 @@
-# free-ig-export
+# LeadFlow
 
-本项目用于探索并构建本地优先（local-first）的社媒线索研究产品。产品从 Chrome 插件起步，后续可扩展为本地桌面客户端与经用户授权的团队工作台。
+本仓库包含 LeadFlow 产品的全部代码：**Chrome 扩展**（公开 Instagram 资料采集）+ **独立官网**（Next.js，发布/定价/合规页面）。
+
+仓库结构：
+
+```
+LeadFlow/
+├── extension/        Chrome MV3 扩展，本地优先采集器
+├── website/          Next.js 官网（igexport.auraflame.tech）
+├── scripts/          扩展打包和图标渲染脚本
+├── docs/             内部研究/审计文档
+├── AGENTS.md         面向协作 agent 的项目说明
+└── README.md         本文件，面向人
+```
+
+两个子项目**互相独立**——不同的技术栈、依赖、构建工具和部署目标，修改时分别进入对应子目录。
+
+## 产品方向（背景）
+
+LeadFlow 起家于一个本地优先 Chrome 扩展 `free-ig-export`：将用户主动访问的 Instagram 公开页面数据转为可用的结构化文件和研究名单。后续在此基础上扩展为本地桌面客户端和团队工作台。
+
+完整的战略、产品定义、竞争分析与合规原则见下方章节（与早期 `free-ig-export` README 同源）。
 
 ## 已确定的产品方向
 
@@ -64,11 +84,11 @@ IG Export 插件
 
 ### 对 Phantombuster
 
-不做面向技术用户的通用云端自动化器；提供固定、易懂的营销研究模板，围绕“找线索/达人—审核—交付”的结果而非任务编排。
+不做面向技术用户的通用云端自动化器；提供固定、易懂的营销研究模板，围绕"找线索/达人—审核—交付"的结果而非任务编排。
 
 ### 对 DolphinRadar
 
-DolphinRadar 的核心是云端持续监控公开 Instagram 账号并建立时间序列行为画像。free-ig-export 不直接复制该高风险模式；我们关注用户主动研究时形成的可行动线索。未来可用用户显式创建的项目快照做前后变化对比。
+DolphinRadar 的核心是云端持续监控公开 Instagram 账号并建立时间序列行为画像。LeadFlow 不直接复制该高风险模式；我们关注用户主动研究时形成的可行动线索。未来可用用户显式创建的项目快照做前后变化对比。
 
 ## 架构与合规原则
 
@@ -83,14 +103,19 @@ DolphinRadar 的核心是云端持续监控公开 Instagram 账号并建立时�
 
 1. 单次导出没有明显技术壁垒；本地插件可较快实现。
 2. 长期壁垒来自：稳定的数据处理、跨来源去重/评分、团队工作流、历史项目数据、SEO/渠道与用户信任。
-3. DolphinRadar 的壁垒重点在云端持续时间序列数据，而非 AI 文案或关系图；这不是 free-ig-export 初期要正面竞争的能力。
-4. Phantombuster 的壁垒在模板库、可靠性、集成和工作流体验；free-ig-export 应用更窄的垂直场景取得更低上手门槛。
+3. DolphinRadar 的壁垒重点在云端持续时间序列数据，而非 AI 文案或关系图；这不是 LeadFlow 初期要正面竞争的能力。
+4. Phantombuster 的壁垒在模板库、可靠性、集成和工作流体验；LeadFlow 应用更窄的垂直场景取得更低上手门槛。
+
+## 开发入口
+
+- 扩展开发与构建命令：`extension/README.md`，约束见根 `AGENTS.md`
+- 官网开发与部署命令：`website/README.md`
+- 贡献约束与合规红线：根 `AGENTS.md`
 
 ## 下一步
 
-1. 已创建可加载的 Manifest V3 MVP，位于 `extension/`：本地 Instagram 列表采集、暂停、任务持久化、去重、CSV/JSON 导出和独立工作台。
-2. 用 5–10 名目标用户验证导出准确性、筛选需求和付费意愿，再决定 LinkedIn 模块的投入时点。
-3. 增加详细公开资料补全、XLSX 导出、项目/标签和采集完整度报告。
-4. 通过独立的 LinkedIn 页面采集适配器，将两类本地数据接入统一的 Lead 项目模型。
-
-# ig-export
+1. 扩展已实现可加载的 Manifest V3 MVP（`extension/`）：本地 Instagram 列表采集、暂停、任务持久化、去重、CSV/JSON 导出和独立工作台。
+2. 官网 v1 已完成（`website/`）：首页 / 定价 / 隐私 / 服务条款四个页面；待部署到 Vercel 并绑定 `igexport.auraflame.tech`。
+3. 用 5–10 名目标用户验证导出准确性、筛选需求和付费意愿，再决定 LinkedIn 模块的投入时点。
+4. 增加详细公开资料补全、XLSX 导出、项目/标签和采集完整度报告。
+5. 通过独立的 LinkedIn 页面采集适配器，将两类本地数据接入统一的 Lead 项目模型。

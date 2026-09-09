@@ -1,13 +1,30 @@
 # AGENTS.md
 
-free-ig-export is a local-first Chrome extension (Manifest V3, plain JS/CSS — no build step, no package manager, no test framework). The entire shippable product lives in `extension/`; root-level zip files are build artifacts, not source.
+free-ig-export is a local-first Chrome extension (Manifest V3, plain JS/CSS — no build step, no package manager, no test framework). The entire shippable extension lives in `extension/`; root-level zip files are build artifacts, not source.
 
-## Commands
+This repo also hosts the LeadFlow marketing website at `website/` (Next.js, separate toolchain and deployment target). The two subprojects are independent — read each subproject's own README/AGENTS.md before editing it. The website's `AGENTS.md` is auto-managed by `next dev` and contains Next.js-specific agent rules; do not edit it manually.
+
+## Repo layout
+
+- `extension/` — Chrome MV3 extension (the product). See `extension/README.md` and constraints below.
+- `website/` — Next.js marketing site (landing, pricing, privacy, terms). See `website/README.md`.
+- `scripts/` — packaging and icon-rendering scripts for the extension only.
+- `docs/` — internal research/audit notes.
+
+## Commands (extension)
 
 - **Load for dev:** `chrome://extensions` → Developer mode → Load unpacked → select `extension/`. Reload the extension after every code change; content-script changes also need the Instagram tab reloaded (the `var collector = globalThis.__free-ig-exportCollector` guard in `content.js` exists to survive extension reloads without a tab refresh).
 - **Package for Web Store:** `node scripts/pack-extension.mjs` — zips `extension/` to `free-ig-export-v<version>.zip` at repo root, version read from `manifest.json`. Requires system `zip`. Bump `manifest.json` `version` first.
 - **Regenerate icons:** `python3 scripts/render-icons.py` (needs Pillow) — derives 16/32/64/128 PNGs from `extension/icons/free-ig-export-exporter-128.png`. Do not hand-edit the size variants.
-- No lint/typecheck/test tooling exists. Verification is manual: load unpacked, sign in to Instagram, run a collection on a public profile. Instagram DOM/API changes break adapters silently — treat `content.js` selectors and `instagram-api.js` query hashes/HTML-ID patterns as regression-prone.
+- No lint/typecheck/test tooling exists for the extension. Verification is manual: load unpacked, sign in to Instagram, run a collection on a public profile. Instagram DOM/API changes break adapters silently — treat `content.js` selectors and `instagram-api.js` query hashes/HTML-ID patterns as regression-prone.
+
+## Commands (website)
+
+- `cd website && npm install` — one-time install.
+- `cd website && npm run dev` — local dev server on http://localhost:3000.
+- `cd website && npm run build` — production build.
+- `cd website && npm run lint` — ESLint.
+- Deployment target is Vercel; `website/deploy.sh` is a helper that builds and pushes to a Git remote.
 
 ## Architecture (`extension/`)
 
