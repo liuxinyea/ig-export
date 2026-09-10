@@ -17,8 +17,8 @@ async function render(task) {
   const pages = Math.max(1, Math.ceil(records.length / pageSize));
   page = Math.min(page, pages);
   $("#count").textContent = records.length;
-  $("#taskSource").textContent = task?.sourceProfile || "â€?;
-  $("#updated").textContent = task?.updatedAt ? new Date(task.updatedAt).toLocaleTimeString(FreeIgExportI18n.locale) : "â€?;
+  $("#taskSource").textContent = task?.sourceProfile || "â€”";
+  $("#updated").textContent = task?.updatedAt ? new Date(task.updatedAt).toLocaleTimeString(FreeIgExportI18n.locale) : "â€”";
   $("#status").textContent = task ? t("status.leads", { status: task.status, count: records.length }) : t("status.none");
   $("#reason").textContent = task?.reasonKey ? t(task.reasonKey, task.reasonParams) : (task?.reason || (task ? t("reason.directRunning") : t("reason.noTask")));
   const active = ["starting", "running", "paused"].includes(task?.status);
@@ -34,15 +34,17 @@ function avatarMarkup(record, className = "avatar") {
   if (record.avatarDataUrl) return `<img class="${className}" src="${esc(record.avatarDataUrl)}" alt="${esc(alt)}">`;
   return `<span class="${className} avatar-placeholder" aria-label="${esc(alt)}">${esc((record.username || "?").slice(0, 1).toUpperCase())}</span>`;
 }
-function row(record) { return `<tr><td class="avatar-cell">${avatarMarkup(record)}</td><td>@${esc(record.username)}</td><td>${esc(record.displayName || "â€?)}</td><td><a href="${esc(record.profileUrl)}" target="_blank" rel="noreferrer">${t("workspace.open")}</a></td><td>${record.isVerified ? t("workspace.yes") : "â€?}</td><td>${new Date(record.collectedAt).toLocaleString(FreeIgExportI18n.locale)}</td></tr>`; }
+function row(record) { return `<tr><td class="avatar-cell">${avatarMarkup(record)}</td><td>@${esc(record.username)}</td><td>${esc(record.displayName || "â€”")}</td><td><a href="${esc(record.profileUrl)}" target="_blank" rel="noreferrer">${t("workspace.open")}</a></td><td>${record.isVerified ? t("workspace.yes") : "â€”"}</td><td>${new Date(record.collectedAt).toLocaleString(FreeIgExportI18n.locale)}</td></tr>`; }
 
 $("#start").addEventListener("click", async () => {
   const username = FreeIgExportInstagramApi.normalizeUsername($("#source").value);
   if (!username) return showError(t("reason.invalidSource"));
+  try { await FreeIgExportLicense.requireCollection(Math.max(1, Number($("#limit").value) || 100)); }
+  catch (error) { return showError(error.message); }
   await ensureAvatarPermission();
   if (activeRun) activeRun.stopped = true;
   page = 1;
-  const task = { id: crypto.randomUUID(), status: "starting", reason: null, sourceProfile: username, listType: $("#listType").value, limit: Math.max(1, Number($("#limit").value) || 300), delayMs: Math.max(1000, Number($("#delay").value) || 5000), records: [], nextCursor: "", profileId: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+  const task = { id: crypto.randomUUID(), status: "starting", reason: null, sourceProfile: username, listType: $("#listType").value, limit: Math.max(1, Number($("#limit").value) || 100), delayMs: Math.max(1000, Number($("#delay").value) || 5000), records: [], nextCursor: "", profileId: "", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
   await saveTask(task); runCollection(task);
 });
 
@@ -75,13 +77,17 @@ async function runCollection(initial) {
     while (!run.stopped && records.length < task.limit) {
       while (run.paused && !run.stopped) await sleep(200);
       if (run.stopped) break;
+      await FreeIgExportLicense.requireCollection(task.limit);
+      if (run.stopped || run.paused) continue;
       const result = await FreeIgExportInstagramApi.getPage({ profileId, listType: task.listType, cursor });
       const seen = new Set(records.map((r) => r.username));
       const incoming = result.records.filter((r) => !seen.has(r.username)).slice(0, task.limit - records.length).map((r) => ({ ...r, platform: "instagram", sourceProfile: username, collectedAt: new Date().toISOString() }));
       await hydrateAvatars(incoming);
+      const current = await getTask();
+      if (run.stopped || current?.id !== run.id) break;
       records.push(...incoming);
       cursor = result.nextCursor || "";
-      task = { ...task, status: "running", reason: null, profileId, sourceProfile: username, records, nextCursor: cursor, updatedAt: new Date().toISOString() };
+      task = { ...task, status: run.paused ? "paused" : "running", reason: null, profileId, sourceProfile: username, records, nextCursor: cursor, updatedAt: new Date().toISOString() };
       await saveTask(task);
       if (!cursor || records.length >= task.limit) break;
       await sleep(task.delayMs || 5000);
@@ -101,6 +107,8 @@ async function exportFile(format) {
   }
   const records = task?.records || [];
   if (!records.length) return showError(t("workspace.noExport"));
+  try { await FreeIgExportLicense.requireExport(format, records.length); }
+  catch (error) { return showError(error.message); }
   const cols = ["platform", "sourceProfile", "username", "displayName", "profileUrl", "avatarUrl", "isVerified", "collectedAt"];
   const headings = cols.map((column) => t(`export.${column}`));
   let content, type, suffix;
@@ -187,7 +195,7 @@ async function ensureAvatarPermission() {
 }
 function buildHtmlExport(task, records) {
   const exportedAt = new Date().toLocaleString();
-  const rows = records.map((record) => `<tr><td>${avatarMarkup(record, "export-avatar")}</td><td><strong>@${esc(record.username)}</strong><span class="name">${esc(record.displayName || "No display name")}</span></td><td><a href="${esc(record.profileUrl)}" target="_blank" rel="noreferrer">View profile</a></td><td>${record.isVerified ? '<span class="verified">Verified</span>' : '<span class="muted">â€?/span>'}</td><td>${new Date(record.collectedAt).toLocaleString()}</td></tr>`).join("");
+  const rows = records.map((record) => `<tr><td>${avatarMarkup(record, "export-avatar")}</td><td><strong>@${esc(record.username)}</strong><span class="name">${esc(record.displayName || "No display name")}</span></td><td><a href="${esc(record.profileUrl)}" target="_blank" rel="noreferrer">View profile</a></td><td>${record.isVerified ? '<span class="verified">Verified</span>' : '<span class="muted">â€”</span>'}</td><td>${new Date(record.collectedAt).toLocaleString()}</td></tr>`).join("");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>free-ig-export Â· ${esc(task.sourceProfile)} export</title><style>body{margin:0;background:#f4f7fb;color:#20304a;font:14px/1.5 Inter,system-ui,-apple-system,sans-serif}.page{max-width:1120px;margin:0 auto;padding:40px 24px 64px}.hero{padding:30px 32px;border-radius:18px;background:linear-gradient(135deg,#1d4ed8,#2563eb 58%,#4f8cff);color:#fff;box-shadow:0 16px 34px rgb(37 99 235 / .22)}.eyebrow{font-size:11px;font-weight:750;letter-spacing:.14em;opacity:.78}.hero h1{margin:6px 0 4px;font-size:30px;letter-spacing:-.8px}.hero p{margin:0;opacity:.88}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}.metric{padding:17px 18px;border:1px solid #dce4ef;border-radius:12px;background:#fff;box-shadow:0 3px 10px rgb(32 52 87 / .04)}.metric span{display:block;color:#71819a;font-size:12px}.metric strong{display:block;margin-top:5px;color:#1e2d47;font-size:20px}.card{overflow:hidden;border:1px solid #dce4ef;border-radius:14px;background:#fff;box-shadow:0 3px 10px rgb(32 52 87 / .04)}.card-head{padding:20px 22px;border-bottom:1px solid #e3e9f1}.card-head h2{margin:0;color:#1b2942;font-size:18px}.card-head p{margin:3px 0 0;color:#71819a;font-size:12px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:13px 18px;border-bottom:1px solid #e8edf4;text-align:left;vertical-align:middle}th{background:#f8faff;color:#71819a;font-size:11px;letter-spacing:.06em;text-transform:uppercase}tr:last-child td{border-bottom:0}.export-avatar{display:inline-grid;width:38px;height:38px;place-items:center;border-radius:50%;background:#e8f0ff;color:#315cc7;font-size:14px;font-weight:700;object-fit:cover}.name{display:block;margin-top:2px;color:#71819a;font-size:12px}a{color:#2563eb;font-weight:650;text-decoration:none}.verified{display:inline-block;padding:3px 8px;border-radius:999px;background:#e8f7ef;color:#16834a;font-size:11px;font-weight:700}.muted{color:#9aa7ba}.footer{margin:18px 0 0;color:#8491a5;font-size:12px;text-align:center}@media(max-width:640px){.page{padding:20px 14px 40px}.hero{padding:24px}.summary{grid-template-columns:1fr}.hero h1{font-size:25px}}</style></head><body><main class="page"><header class="hero"><div class="eyebrow">free-ig-export Â· LOCAL-FIRST RESEARCH</div><h1>Instagram lead export</h1><p>Collected from @${esc(task.sourceProfile)} Â· ${esc(task.listType)}</p></header><section class="summary"><div class="metric"><span>Collected leads</span><strong>${records.length}</strong></div><div class="metric"><span>Source profile</span><strong>@${esc(task.sourceProfile)}</strong></div><div class="metric"><span>Exported</span><strong>${esc(exportedAt)}</strong></div></section><section class="card"><div class="card-head"><h2>Collected leads</h2><p>Public profile data gathered locally in free-ig-export.</p></div><div class="table-wrap"><table><thead><tr><th>Avatar</th><th>Profile</th><th>Link</th><th>Verified</th><th>Collected at</th></tr></thead><tbody>${rows}</tbody></table></div></section><p class="footer">Generated locally by free-ig-export Â· Avatar images remain hosted at their original public URLs.</p></main></body></html>`;
 }
 function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); } function csv(v) { return `"${String(v ?? "").replaceAll('"','""')}"`; } function esc(v) { return String(v ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]); } function showError(message) { $("#reason").textContent = message; }

@@ -22,6 +22,8 @@ npm run lint
 
 ## 部署
 
+支付使用 Dodo Payments：月付、季付、年付和 Lifetime，付款后由邮件交付 License Key。环境变量见 `.env.example`，产品、Webhook、扩展激活及测试流程见 [PAYMENTS.md](./PAYMENTS.md)。
+
 Vercel 导入本仓库后自动识别 Next.js 项目；根目录指 `website/`，或把仓库结构调整为仅 `website/` 作为 Vercel 项目根。
 
 `deploy.sh` 是可选的辅助脚本（构建 + 推送到 Git remote）。Vercel 更推荐直接连 GitHub 触发部署。

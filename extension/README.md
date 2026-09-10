@@ -17,6 +17,14 @@ Load this folder in Chrome through `chrome://extensions` → enable Developer mo
 4. Select Direct API mode only when you want the separate workspace flow; it pre-fills the current profile and list configuration.
 5. Pause or export the local results from the workspace.
 
-## Known MVP limits
+## Billing and activation
+
+Open **License & plans** from the popup or workspace. Checkout happens on the website; Dodo Payments delivers the license key by email. Paste the key to activate this browser, or deactivate to release its activation slot.
+
+Free supports collections of up to 100 records and CSV/JSON export. Pro enables larger collections and other existing export formats. Paid operations require online validation; collected Instagram data is never sent to the licensing service. The website origin is an optional host permission requested during activation. Dodo API credentials remain on the website server.
+
+See `../website/PAYMENTS.md` for test/live configuration and `../scripts/configure-extension-billing.mjs` for changing the public billing origin in local development.
+
+## Remaining MVP limits
 
 Instagram's DOM and web data routes can change without notice and should be treated as adapters requiring regression testing. Detailed profile enrichment, XLSX output, projects, tags and LinkedIn are planned next.

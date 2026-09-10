@@ -1,6 +1,21 @@
+import { handleLicense } from "./license-service.js";
+
 const CURRENT_TASK_KEY = "free-ig-export.currentTask";
+// Keep license keys out of content-script storage access.
+void chrome.storage.local.setAccessLevel({ accessLevel: "TRUSTED_CONTEXTS" });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "free-ig-export:license") {
+    if (!sender.url?.startsWith(chrome.runtime.getURL(""))) {
+      sendResponse({ ok: false, error: "License actions require an extension page." });
+      return;
+    }
+    handleLicense(message.action, message.payload).then(
+      (data) => sendResponse({ ok: true, data }),
+      (error) => sendResponse({ ok: false, error: error.message || "License request failed." })
+    );
+    return true;
+  }
   if (message.type === "free-ig-export:open-workspace") {
     chrome.tabs.create({ url: "workspace.html" });
     sendResponse({ ok: true });

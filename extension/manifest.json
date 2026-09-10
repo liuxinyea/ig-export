@@ -24,16 +24,29 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["activeTab", "storage", "downloads", "tabs", "scripting"],
-  "host_permissions": ["https://www.instagram.com/*"],
+  "permissions": [
+    "activeTab",
+    "storage",
+    "downloads",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.instagram.com/*"
+  ],
   "optional_host_permissions": [
     "https://*.cdninstagram.com/*",
-    "https://*.fbcdn.net/*"
+    "https://*.fbcdn.net/*",
+    "https://igexport.auraflame.tech/*"
   ],
   "web_accessible_resources": [
     {
-      "resources": ["i18n/*.json"],
-      "matches": ["https://www.instagram.com/*"]
+      "resources": [
+        "i18n/*.json"
+      ],
+      "matches": [
+        "https://www.instagram.com/*"
+      ]
     }
   ],
   "minimum_chrome_version": "102"

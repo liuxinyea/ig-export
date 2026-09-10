@@ -19,7 +19,7 @@ $("#start").addEventListener("click", async () => {
   const username = usernameFromUrl(currentTab?.url);
   const mode = document.querySelector('input[name="mode"]:checked').value;
   const listType = $("#listType").value;
-  const limit = Math.max(1, Number($("#limit").value) || 300);
+  const limit = Math.max(1, Number($("#limit").value) || 100);
   const delayMs = Math.max(1000, Number($("#delay").value) || 5000);
   if (mode === "api") {
     const query = new URLSearchParams({ listType, limit: String(limit), delay: String(delayMs) });
@@ -33,6 +33,7 @@ $("#start").addEventListener("click", async () => {
     return;
   }
   try {
+    await FreeIgExportLicense.requireCollection(limit);
     await ensureContentScript(currentTab.id);
     const task = { id: crypto.randomUUID(), status: "starting", reason: null, sourceProfile: username, listType, limit, records: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
     await chrome.storage.local.set({ [TASK_KEY]: task });
@@ -41,7 +42,7 @@ $("#start").addEventListener("click", async () => {
   } catch (error) { $("#hint").textContent = error.message || t("reason.apiPaused"); }
 });
 
-$("#pricing").addEventListener("click", () => chrome.tabs.create({ url: "pricing.html" }));
+$("#pricing").addEventListener("click", () => chrome.tabs.create({ url: "license.html" }));
 $("#pause").addEventListener("click", () => controlCollection("pause"));
 $("#stop").addEventListener("click", () => controlCollection("stop"));
 $("#csv").addEventListener("click", () => exportTask("csv"));
@@ -118,6 +119,7 @@ async function controlCollection(action) {
   try {
     await ensureContentScript(currentTab.id);
     if (action === "pause" && task.status === "paused") {
+      await FreeIgExportLicense.requireCollection(task.limit);
       await chrome.tabs.sendMessage(currentTab.id, { type: "free-ig-export:collector-resume" });
     } else {
       await chrome.tabs.sendMessage(currentTab.id, { type: action === "stop" ? "free-ig-export:collector-stop" : "free-ig-export:collector-pause" });
@@ -129,6 +131,8 @@ async function exportTask(format) {
   const task = (await chrome.storage.local.get(TASK_KEY))[TASK_KEY];
   const records = task?.records || [];
   if (!records.length) return setHint(t("popup.noExport"));
+  try { await FreeIgExportLicense.requireExport(format, records.length); }
+  catch (error) { return setHint(error.message); }
   const columns = ["platform", "sourceProfile", "username", "displayName", "profileUrl", "avatarUrl", "isVerified", "collectedAt"];
   const headings = columns.map((key) => t(`export.${key}`));
   let content; let mimeType; let extension;

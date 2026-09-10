@@ -38,10 +38,10 @@ function PrivacyContent() {
           </h3>
           <ul className="list-disc pl-6 text-gray-600 mb-6 space-y-2">
             <li>
-              Account information (email, name) when you create an account
+              Checkout information (email, name and billing details) provided to Dodo Payments
             </li>
             <li>
-              Payment information when you subscribe to our Pro plan
+              Payment information provided directly to Dodo Payments for subscriptions or Lifetime purchases
             </li>
             <li>
               Communications you send to us (support requests, feedback)
@@ -52,9 +52,9 @@ function PrivacyContent() {
             1.2 Information Collected Automatically
           </h3>
           <ul className="list-disc pl-6 text-gray-600 mb-6 space-y-2">
-            <li>Usage data (features used, export frequency, error logs)</li>
-            <li>Device information (browser type, operating system)</li>
-            <li>Extension version and configuration</li>
+            <li>License key and activation instance identifier when you activate, validate or deactivate Pro</li>
+            <li>A generic activation name identifying this Chrome extension installation</li>
+            <li>Technical request information processed by our website hosting provider</li>
           </ul>
 
           <h3 className="text-xl font-semibold text-gray-900 mt-8 mb-3">
@@ -84,9 +84,7 @@ function PrivacyContent() {
           </h2>
           <p className="text-gray-600 mb-6">
             We implement appropriate security measures to protect your personal
-            information. Your account data is stored securely on our servers,
-            while your exported Instagram data remains entirely on your local
-            device.
+            information. Dodo Payments stores payment and license records. The extension stores your license key and activation identifier in local browser storage. Our licensing API forwards these credentials to Dodo Payments for validation and does not maintain a separate customer database. Your exported Instagram data remains on your device.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">
@@ -97,15 +95,10 @@ function PrivacyContent() {
           </p>
           <ul className="list-disc pl-6 text-gray-600 mb-6 space-y-2">
             <li>
-              <strong>Stripe:</strong> Payment processing (we do not store your
-              credit card information)
+              <strong>Dodo Payments:</strong> Checkout, payment processing, subscription management and license key delivery (we do not store your credit card information)
             </li>
             <li>
-              <strong>Vercel:</strong> Website hosting and analytics
-            </li>
-            <li>
-              <strong>Google Analytics:</strong> Website usage analytics
-              (anonymized)
+              <strong>Vercel:</strong> Website hosting
             </li>
           </ul>
 
@@ -113,9 +106,7 @@ function PrivacyContent() {
             {t("section5")}
           </h2>
           <p className="text-gray-600 mb-6">
-            We retain your account information for as long as your account is
-            active. If you delete your account, we will delete your personal
-            information within 30 days, except where required by law.
+            Your local license credentials are removed when you deactivate this browser. Collected Instagram records can be cleared in the extension. Dodo Payments manages retention of payment, subscription and licensing records under its own policies.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">

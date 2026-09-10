@@ -50,9 +50,9 @@ function TermsContent() {
               Exporting follower and following lists from public Instagram
               profiles
             </li>
-            <li>Exporting data in CSV, JSON, and XLSX formats</li>
-            <li>Project management and data organization features</li>
-            <li>Data filtering and tagging capabilities</li>
+            <li>Exporting data in CSV, JSON, Excel (.xls), HTML and Markdown formats, depending on the interface and plan</li>
+            <li>Local collection storage and username deduplication</li>
+            <li>License key activation for Pro features</li>
           </ul>
 
           <h2 className="text-2xl font-bold text-gray-900 mt-12 mb-4">
@@ -94,9 +94,9 @@ function TermsContent() {
           <ul className="list-disc pl-6 text-gray-600 mb-6 space-y-2">
             <li>You agree to pay the subscription fees</li>
             <li>
-              Subscriptions are billed in advance on a monthly or annual basis
+              Subscriptions are billed in advance on a monthly, quarterly or yearly basis through Dodo Payments. Lifetime is a one-time purchase
             </li>
-            <li>You can cancel your subscription at any time</li>
+            <li>You can manage cancellation through the Dodo Payments customer portal. License validity follows the subscription lifecycle; cancellation and refund effects are determined by the provider status.</li>
             <li>Refunds are available within 30 days of purchase</li>
             <li>
               We reserve the right to change subscription prices with 30 days

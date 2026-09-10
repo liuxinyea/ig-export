@@ -36,7 +36,7 @@
                 </div>
                 <div>
                     <label
-                            ><span data-i18n="popup.limit">Limit</span><input id="limit" class="layui-input" type="number" min="1" value="300" /></label
+                            ><span data-i18n="popup.limit">Limit</span><input id="limit" class="layui-input" type="number" min="1" value="100" /></label
                     >
                 </div>
                 <div><label><span data-i18n="popup.interval">Interval (ms)</span><input id="delay" class="layui-input" type="number" min="1000" step="500" value="5000" /></label></div>
@@ -49,9 +49,9 @@
             </section>
             <section class="metrics">
                 <div class="layui-panel"><span data-i18n="workspace.collected">Collected</span><strong id="count">0</strong></div>
-                <div class="layui-panel"><span data-i18n="workspace.sourceMetric">Source</span><strong id="taskSource">â€?/strong></div>
+                <div class="layui-panel"><span data-i18n="workspace.sourceMetric">Source</span><strong id="taskSource">â€”</strong></div>
                 <div class="layui-panel">
-                    <span data-i18n="workspace.lastUpdate">Last update</span><strong id="updated">â€?/strong>
+                    <span data-i18n="workspace.lastUpdate">Last update</span><strong id="updated">â€”</strong>
                 </div>
             </section>
             <section class="layui-panel panel">
@@ -90,8 +90,8 @@
             </section>
         </main>
         <script src="vendor/layui/layui.js"></script>
-        <script src="i18n.js"></script>
+        <script src="i18n.js"></script><script src="license-client.js"></script>
         <script src="instagram-api.js"></script>
         <script src="workspace-direct-v2.js"></script>
-    </body>
+    <p style="text-align:center;padding:16px"><a href="license.html" target="_blank">License &amp; plans</a></p></body>
 </html>

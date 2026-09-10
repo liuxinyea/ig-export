@@ -199,7 +199,7 @@ function stopCollector(reasonKey, status = "paused") {
 function collectOnce() {
   if (!collector || collector.paused) return;
   const records = collectVisibleProfiles();
-  const fresh = records.filter((record) => !collector.seen.has(record.username));
+  const fresh = records.filter((record) => !collector.seen.has(record.username)).slice(0, Math.max(0, collector.limit - collector.seen.size));
   fresh.forEach((record) => collector.seen.add(record.username));
 
   if (fresh.length) {

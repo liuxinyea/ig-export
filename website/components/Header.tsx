@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 const localeLabels: Record<string, string> = {
@@ -28,9 +29,9 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-900">IG Export</span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">

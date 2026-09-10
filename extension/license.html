@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IG Export — License &amp; plans</title>
+  <link rel="stylesheet" href="license.css">
+</head>
+<body><main>
+  <p class="brand">IG EXPORT PRO</p>
+  <h1>License &amp; plans</h1>
+  <p>Choose monthly, quarterly, yearly or Lifetime on our website. After payment, Dodo Payments emails your license key.</p>
+  <section>
+    <h2>Activate this browser</h2>
+    <p id="status" role="status" aria-live="polite">Checking license…</p>
+    <form id="licenseForm">
+      <label for="licenseKey">License key</label>
+      <input id="licenseKey" type="password" autocomplete="off" spellcheck="false" maxlength="256" required placeholder="Paste the key from your email">
+      <button id="activate" disabled>Activate license</button>
+    </form>
+    <div class="actions"><button id="refresh" type="button" disabled>Check status</button><button id="deactivate" type="button" disabled>Deactivate this browser</button></div>
+    <p id="error" role="alert"></p>
+  </section>
+  <button id="buy" type="button" disabled>View plans on website</button>
+  <p class="note">Free: up to 100 records per collection, CSV and JSON. Pro: higher collection limits and all existing export formats. Instagram restrictions still apply.</p>
+  <p class="note">Activation sends only your license key and a browser activation identifier to our licensing service. Instagram data stays on your device. Paid operations require an online license check.</p>
+  <p class="note">Deactivate before moving to another browser to release an activation slot. Manage billing using the customer portal link from your Dodo Payments email.</p>
+</main><script src="license-client.js"></script><script src="license-ui.js"></script></body>
+</html>
