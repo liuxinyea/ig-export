@@ -1,4 +1,4 @@
-export const planNames = ["monthly", "quarterly", "yearly", "lifetime"] as const;
+export const planNames = ["monthly", "quarterly", "yearly"] as const;
 export type Plan = (typeof planNames)[number];
 
 export class BillingError extends Error {

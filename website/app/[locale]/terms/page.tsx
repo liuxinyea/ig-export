@@ -1,5 +1,27 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]/terms">): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata.terms" });
+
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: {
+      canonical: `/${locale}/terms`,
+      languages: {
+        en: "/en/terms",
+        zh: "/zh/terms",
+        "x-default": "/en/terms",
+      },
+    },
+  };
+}
 
 export default async function TermsPage({
   params,

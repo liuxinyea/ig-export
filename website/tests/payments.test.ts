@@ -13,7 +13,7 @@ Object.assign(process.env, {
   APP_URL: "http://localhost:3000", DODO_PAYMENTS_ENVIRONMENT: "test_mode",
   DODO_PAYMENTS_BUSINESS_ID: "bus_ours", DODO_PAYMENTS_PRODUCT_MONTHLY: "pdt_monthly",
   DODO_PAYMENTS_PRODUCT_QUARTERLY: "pdt_quarterly", DODO_PAYMENTS_PRODUCT_YEARLY: "pdt_yearly",
-  DODO_PAYMENTS_PRODUCT_LIFETIME: "pdt_lifetime", DODO_PAYMENTS_CHECKOUT_SECRET: "test-secret-only-012345678901234567890123456789",
+  DODO_PAYMENTS_CHECKOUT_SECRET: "test-secret-only-012345678901234567890123456789",
   CHROME_EXTENSION_IDS: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 });
 
@@ -33,9 +33,9 @@ const license = { key: "secret-license", business_id: "bus_ours", product_id: "p
 const instance = { id: "lki_ours", business_id: "bus_ours", license_key_id: "lic_ours" };
 const validResponses = { "/license_key_instances/lki_ours": instance, "/license_keys/lic_ours": license, "/licenses/validate": { valid: true } };
 
-test("only four server-configured plans are accepted", () => {
-  for (const value of ["monthly", "quarterly", "yearly", "lifetime"]) assert.equal(parsePlan(value), value);
-  for (const value of ["__proto__", "constructor", "pdt_attacker", null, {}]) assert.throws(() => parsePlan(value));
+test("only three server-configured plans are accepted", () => {
+  for (const value of ["monthly", "quarterly", "yearly"]) assert.equal(parsePlan(value), value);
+  for (const value of ["lifetime", "__proto__", "constructor", "pdt_attacker", null, {}]) assert.throws(() => parsePlan(value));
   assert.throws(() => planForProduct("foreign"));
 });
 
@@ -80,21 +80,19 @@ test("foreign activation is released and never returned as Pro", async () => {
 
 test("own activation returns only the activation reference and plan", async () => {
   const result = await activateLicense("secret-license", "browser", mockClient({ "/licenses/activate": {
-    id: "lki_ours", business_id: "bus_ours", product: { product_id: "pdt_lifetime" }, customer: { email: "private@example.com" },
+    id: "lki_ours", business_id: "bus_ours", product: { product_id: "pdt_yearly" }, customer: { email: "private@example.com" },
   } }));
-  assert.deepEqual(result, { valid: true, plan: "lifetime", instanceId: "lki_ours" });
+  assert.deepEqual(result, { valid: true, plan: "yearly", instanceId: "lki_ours" });
 });
 
-test("catalog checks billing intervals and license delivery before checkout", () => {
+test("catalog checks one-time pricing and license delivery before checkout", () => {
   const base = { business_id: "bus_ours", license_key_enabled: false, entitlements: [{ integration_type: "license_key" }] };
-  for (const [plan, interval, count] of [["monthly", "Month", 1], ["quarterly", "Month", 3], ["yearly", "Year", 1]] as const) {
-    const product = { ...base, price: { type: "recurring_price", price: 1000, currency: "USD", payment_frequency_interval: interval, payment_frequency_count: count } } as Product;
+  for (const plan of ["monthly", "quarterly", "yearly"] as const) {
+    const product = { ...base, price: { type: "one_time_price", price: 1000, currency: "USD", pay_what_you_want: false } } as Product;
     assert.equal(checkProduct(product, plan).price, 1000);
-    assert.throws(() => checkProduct(product, "lifetime"));
+    assert.throws(() => checkProduct({ ...base, price: { type: "recurring_price", price: 1000, currency: "USD" } } as Product, plan));
     assert.throws(() => checkProduct({ ...product, entitlements: [] }, plan));
   }
-  const lifetime = { ...base, price: { type: "one_time_price", price: 10000, currency: "USD", pay_what_you_want: false } } as Product;
-  assert.equal(checkProduct(lifetime, "lifetime").type, "one_time_price");
 });
 
 test("billing mutations reject foreign origins and oversized input", async () => {
